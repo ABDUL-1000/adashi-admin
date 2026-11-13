@@ -1,3 +1,5 @@
+import type { AdminUserType } from "./user.types";
+
 export interface AdminDashboard {
   totalUsers?: number;
   newUsers?: number;
@@ -19,4 +21,9 @@ export interface AdminDashboard {
   payoutRevenue?: number;
   subscriptionRevenue?: number;
   otherRevenue?: number;
+  userTypes?: Partial<Record<AdminUserType, number>>;
+  pssPlans?: number;
+  pssActivePlans?: number;
+  pssTotalValueKobo?: number;
+  pssTotalPaidKobo?: number;
 }

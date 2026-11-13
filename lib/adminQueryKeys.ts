@@ -15,4 +15,7 @@ export const adminQueryKeys = {
   dispute: (id: string) => ["admin", "disputes", id] as const,
   analytics: ["admin", "analytics"] as const,
   settings: ["admin", "settings"] as const,
+  pssSummary: ["admin", "pss", "summary"] as const,
+  pssPlans: (params: ListParams) => ["admin", "pss", "plans", params] as const,
+  pssCustomers: (params: ListParams) => ["admin", "pss", "customers", params] as const,
 };

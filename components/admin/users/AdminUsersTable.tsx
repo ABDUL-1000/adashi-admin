@@ -12,6 +12,19 @@ import { useVerifyUser } from "@/hooks/admin/useVerifyUser";
 import { entityId } from "@/types/admin/common.types";
 import type { AdminUser } from "@/types/admin/user.types";
 import { formatDate } from "@/lib/formatDate";
+import { UserTypeBadges } from "./UserTypeBadges";
+
+function activitySummary(user: AdminUser) {
+  const c = user.counts;
+  if (!c) return "Not available";
+  const parts = [
+    c.groupsOrganized ? `Organises ${c.groupsOrganized}` : null,
+    c.groupMemberships ? `In ${c.groupMemberships} group(s)` : null,
+    c.pssPlansSold ? `Sells ${c.pssPlansSold} PSS plan(s)` : null,
+    c.pssPlansBought ? `Buying ${c.pssPlansBought} PSS plan(s)` : null,
+  ].filter(Boolean);
+  return parts.length ? parts.join(" · ") : "No activity yet";
+}
 
 function UserActions({ user }: { user: AdminUser }) {
   const id = entityId(user);
@@ -49,14 +62,15 @@ export function AdminUsersTable({ users }: { users: AdminUser[] }) {
     <Card className="rounded-lg border border-[#E2E4E9] bg-white p-0 shadow-none">
       <div className="hidden md:block">
         <Table>
-          <TableHeader><TableRow><TableHead>User</TableHead><TableHead>Phone</TableHead><TableHead>Status</TableHead><TableHead>Verified</TableHead><TableHead>Created</TableHead><TableHead /></TableRow></TableHeader>
+          <TableHeader><TableRow><TableHead>User</TableHead><TableHead>Phone</TableHead><TableHead>Type</TableHead><TableHead>Activity</TableHead><TableHead>Status</TableHead><TableHead>Created</TableHead><TableHead /></TableRow></TableHeader>
           <TableBody>
             {users.map((user) => (
               <TableRow key={entityId(user)}>
                 <TableCell><div className="font-medium">{user.name ?? user.fullName ?? "Unnamed user"}</div><div className="text-xs text-[#828587]">{user.email ?? "No email"}</div></TableCell>
                 <TableCell>{user.phone ?? "Not available"}</TableCell>
-                <TableCell><AdminStatusBadge status={Boolean(user.isSuspended ?? user.suspended) ? "SUSPENDED" : "ACTIVE"} /></TableCell>
-                <TableCell><AdminStatusBadge status={Boolean(user.isVerified ?? user.verified)} /></TableCell>
+                <TableCell><UserTypeBadges types={user.userTypes} /></TableCell>
+                <TableCell className="max-w-56 whitespace-normal text-sm text-[#828587]">{activitySummary(user)}</TableCell>
+                <TableCell><AdminStatusBadge status={user.deletedAt ? "DELETED" : Boolean(user.isSuspended ?? user.suspended) ? "SUSPENDED" : "ACTIVE"} /></TableCell>
                 <TableCell>{formatDate(user.createdAt)}</TableCell>
                 <TableCell><UserActions user={user} /></TableCell>
               </TableRow>
@@ -69,6 +83,8 @@ export function AdminUsersTable({ users }: { users: AdminUser[] }) {
           <div key={entityId(user)} className="rounded-lg border border-[#E2E4E9] p-3">
             <p className="font-medium">{user.name ?? user.fullName ?? "Unnamed user"}</p>
             <p className="text-sm text-[#828587]">{user.email ?? user.phone ?? "No contact"}</p>
+            <div className="mt-2"><UserTypeBadges types={user.userTypes} /></div>
+            <p className="mt-2 text-xs text-[#828587]">{activitySummary(user)}</p>
             <div className="mt-3"><UserActions user={user} /></div>
           </div>
         ))}
